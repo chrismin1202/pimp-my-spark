@@ -78,8 +78,8 @@ pomExtra :=
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:scalanlp/breeze.git</url>
-    <connection>scm:git:git@github.com:scalanlp/breeze.git</connection>
+    <url>git@github.com:chrismin1202/pimp-my-spark.git</url>
+    <connection>scm:git:git@github.com:chrismin1202/pimp-my-spark.git</connection>
   </scm>
   <developers>
     <developer>
