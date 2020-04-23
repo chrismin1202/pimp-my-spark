@@ -16,7 +16,6 @@ object Dependencies {
 
   import sbt._
 
-  private val Json4sGroupId: String = "org.json4s"
   private val SparkGroupId: String = "org.apache.spark"
 
   // Note that is project is used in Spark applications; therefore,
