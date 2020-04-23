@@ -47,7 +47,7 @@ trait SparkApplicationLike extends MainLike {
     }
   }
 
-  private[this] def runStages(args: Array[String])(implicit spark: SparkSession): Seq[ApplicationStatus] = {
+  private[spark] def runStages(args: Array[String])(implicit spark: SparkSession): Seq[ApplicationStatus] = {
     val sparkStages = stages(args)
     val statuses = new mutable.ArrayBuffer[ApplicationStatus](sparkStages.size)
     val iterator = sparkStages.iterator

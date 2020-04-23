@@ -20,20 +20,12 @@ object Dependencies {
   private val SparkGroupId: String = "org.apache.spark"
 
   // Note that is project is used in Spark applications; therefore,
-  // the versions of some of these dependencies are set to match those of Spark dependencies.
+  // the versions of the dependencies should match those of Spark dependencies.
   private val SparkVersion: String = "2.4.5"
-  private val CommonsLang3Version: String = "3.5"
-  private val CommonsIoVersion: String = "2.6"
-  private val Json4sVersion: String = "3.5.3"
 
   private val ScalacheckVersion: String = "1.14.0"
   private val ScalatestVersion: String = "3.0.8"
   private val Specs2CoreVersion: String = "4.7.0"
-
-  val SourceCode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.2.1"
-  val CommonsLang3: ModuleID = "org.apache.commons" % "commons-lang3" % CommonsLang3Version
-  val CommonsIo: ModuleID = "commons-io" % "commons-io" % CommonsIoVersion
-  val Json4sNative: ModuleID = Json4sGroupId %% "json4s-native" % Json4sVersion
 
   val Log4s: ModuleID = "org.log4s" %% "log4s" % "1.8.2"
 

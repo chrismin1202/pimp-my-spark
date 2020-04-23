@@ -30,6 +30,8 @@ developers := List(
   Developer("chrismin1202", "Donatello", "chrism.1202@gmail.com", url("https://github.com/chrismin1202")),
 )
 
+credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
+
 parallelExecution in Test := false
 
 fork in Test := true
@@ -39,13 +41,9 @@ javaOptions in Test += "-Djdk.logging.allowStackWalkSearch=true"
 connectInput in Test := true
 
 libraryDependencies ++= Seq(
-  SourceCode,
-  CommonsLang3,
-  CommonsIo,
   SparkCore % Provided,
   SparkSql % Provided,
   SparkHive % Provided,
-  Json4sNative,
   Log4s,
   CatsEffect,
   SaajImpl % Test,
@@ -64,3 +62,28 @@ assemblyMergeStrategy in assembly := {
   case meta(_)                                       => MergeStrategy.discard
   case _                                             => MergeStrategy.first
 }
+
+publishMavenStyle := true
+publishArtifact in Test := true
+updateOptions := updateOptions.value.withGigahorse(false)
+publishTo := Some(
+  "chrism pimp-my-spark GitHub Package Registry" at "https://maven.pkg.github.com/chrismin1202/pimp-my-spark"
+)
+pomExtra :=
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:scalanlp/breeze.git</url>
+    <connection>scm:git:git@github.com:scalanlp/breeze.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>donatello</id>
+      <name>Donatello</name>
+    </developer>
+  </developers>

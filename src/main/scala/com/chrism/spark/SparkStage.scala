@@ -16,6 +16,7 @@ package com.chrism.spark
 
 import org.apache.spark.sql.SparkSession
 
+/** A trait for defining a Spark application */
 trait SparkStage {
 
   /** Override and implement the Spark application.
