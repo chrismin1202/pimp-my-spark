@@ -17,7 +17,7 @@ import Dependencies._
 organization := "com.chrism.spark"
 name := "pimp-my-spark"
 
-version := "0.0.2"
+version := "3.0.0"
 
 scalaVersion := "2.12.10"
 
@@ -32,6 +32,8 @@ developers := List(
 
 credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
+resolvers += "chrism commons4s GitHub Package Registry" at "https://maven.pkg.github.com/chrismin1202/commons4s"
+
 parallelExecution in Test := false
 
 fork in Test := true
@@ -44,24 +46,12 @@ libraryDependencies ++= Seq(
   SparkCore % Provided,
   SparkSql % Provided,
   SparkHive % Provided,
-  Log4s,
   CatsEffect,
-  SaajImpl % Test,
   Scalacheck % Test,
   Scalatest % Test,
   Specs2Core % Test,
+  Commons4s % Test classifier "tests",
 )
-
-val meta = "META.INF(.)*".r
-assemblyMergeStrategy in assembly := {
-  case PathList("javax", "servlet", _ @_*)           => MergeStrategy.first
-  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
-  case n if n.contains("services")                   => MergeStrategy.concat
-  case n if n.startsWith("reference.conf")           => MergeStrategy.concat
-  case n if n.endsWith(".conf")                      => MergeStrategy.concat
-  case meta(_)                                       => MergeStrategy.discard
-  case _                                             => MergeStrategy.first
-}
 
 publishMavenStyle := true
 publishArtifact in Test := true

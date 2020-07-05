@@ -14,6 +14,7 @@
  */
 package com.chrism.spark
 
+import com.chrism.commons.FunTestSuite
 import org.apache.spark.sql.SparkSession
 
 final class SparkApplicationLikeTest extends FunTestSuite {
