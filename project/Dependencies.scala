@@ -18,15 +18,13 @@ object Dependencies {
 
   private val SparkGroupId: String = "org.apache.spark"
 
-  // Note that is project is used in Spark applications; therefore,
-  // the versions of the dependencies should match those of Spark dependencies.
-  private val SparkVersion: String = "2.4.5"
+  private val SparkVersion: String = "3.0.0"
 
   private val ScalacheckVersion: String = "1.14.0"
   private val ScalatestVersion: String = "3.0.8"
   private val Specs2CoreVersion: String = "4.7.0"
 
-  val Log4s: ModuleID = "org.log4s" %% "log4s" % "1.8.2"
+  val Commons4s: ModuleID = "com.chrism" %% "commons4s" % "1.0.0"
 
   val SparkCore: ModuleID = SparkGroupId %% "spark-core" % SparkVersion
   val SparkSql: ModuleID = SparkGroupId %% "spark-sql" % SparkVersion
@@ -34,7 +32,6 @@ object Dependencies {
 
   val CatsEffect: ModuleID = "org.typelevel" %% "cats-effect" % "2.1.3"
 
-  val SaajImpl: ModuleID = "com.sun.xml.messaging.saaj" % "saaj-impl" % "1.5.1"
   val Scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % ScalacheckVersion
   val Scalatest: ModuleID = "org.scalatest" %% "scalatest" % ScalatestVersion
   val Specs2Core: ModuleID = "org.specs2" %% "specs2-core" % Specs2CoreVersion
