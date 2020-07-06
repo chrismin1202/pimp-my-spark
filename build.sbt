@@ -17,7 +17,7 @@ import Dependencies._
 organization := "com.chrism.spark"
 name := "pimp-my-spark"
 
-version := "3.0.0"
+version := "3.1.0"
 
 scalaVersion := "2.12.10"
 
