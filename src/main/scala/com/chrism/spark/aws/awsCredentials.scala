@@ -15,18 +15,44 @@
 package com.chrism.spark.aws
 
 import com.chrism.commons.util.StringUtils
+import org.apache.hadoop.conf.Configuration
 
 sealed trait AwsCredentialsLike extends Product with Serializable {
+
+  import AwsCredentialsHadoopConfiguration.{addProvider, CredentialsProviderName}
 
   def accessKey: String
 
   def secretKey: String
+
+  protected def credentialsProvider: Class[_]
+
+  protected def setCredentials(hadoopConf: Configuration): Unit
+
+  final def setToHadoopConf(hadoopConf: Configuration): Unit = {
+    val chainedProvider = hadoopConf.get(CredentialsProviderName)
+    hadoopConf.set(
+      CredentialsProviderName,
+      if (chainedProvider == null) credentialsProvider.getName
+      else addProvider(credentialsProvider, chainedProvider))
+    setCredentials(hadoopConf)
+  }
 }
 
 final case class AwsCredentials(accessKey: String, secretKey: String) extends AwsCredentialsLike {
 
+  import AwsCredentialsHadoopConfiguration.{AccessKeyName, SecretKeyName}
+
   require(StringUtils.isNotBlank(accessKey), "The access key cannot be blank!")
   require(StringUtils.isNotBlank(secretKey), "The secret key cannot be blank!")
+
+  override protected val credentialsProvider: Class[_] =
+    classOf[org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider]
+
+  override protected def setCredentials(hadoopConf: Configuration): Unit = {
+    hadoopConf.set(AccessKeyName, accessKey)
+    hadoopConf.set(SecretKeyName, secretKey)
+  }
 
   override def toString: String = s"$productPrefix($accessKey,${AwsCredentials.obfuscate(secretKey)})"
 }
@@ -45,4 +71,9 @@ case object AwsAnonymousCredentials extends AwsCredentialsLike {
   override val accessKey: String = null
 
   override val secretKey: String = null
+
+  override protected val credentialsProvider: Class[_] =
+    classOf[org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider]
+
+  override protected def setCredentials(hadoopConf: Configuration): Unit = {}
 }

@@ -44,9 +44,11 @@ connectInput in Test := true
 
 libraryDependencies ++= Seq(
   Commons4s,
-  SparkCore % Provided,
-  SparkSql % Provided,
-  SparkHive % Provided,
+  HadoopClient,
+  HadoopAws,
+  SparkCore,
+  SparkSql,
+  SparkHive,
   CatsEffect,
   Scalacheck % Test,
   Scalatest % Test,
