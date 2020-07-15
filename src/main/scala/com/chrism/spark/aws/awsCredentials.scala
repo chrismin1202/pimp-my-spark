@@ -19,7 +19,7 @@ import org.apache.hadoop.conf.Configuration
 
 sealed trait AwsCredentialsLike extends Product with Serializable {
 
-  import AwsCredentialsHadoopConfiguration.{addProvider, CredentialsProviderName}
+  import AwsHadoopConfiguration.{addCredentialsProvider, CredentialsProviderName}
 
   def accessKey: String
 
@@ -34,14 +34,14 @@ sealed trait AwsCredentialsLike extends Product with Serializable {
     hadoopConf.set(
       CredentialsProviderName,
       if (chainedProvider == null) credentialsProvider.getName
-      else addProvider(credentialsProvider, chainedProvider))
+      else addCredentialsProvider(credentialsProvider, chainedProvider))
     setCredentials(hadoopConf)
   }
 }
 
 final case class AwsCredentials(accessKey: String, secretKey: String) extends AwsCredentialsLike {
 
-  import AwsCredentialsHadoopConfiguration.{AccessKeyName, SecretKeyName}
+  import AwsHadoopConfiguration.{AccessKeyName, SecretKeyName}
 
   require(StringUtils.isNotBlank(accessKey), "The access key cannot be blank!")
   require(StringUtils.isNotBlank(secretKey), "The secret key cannot be blank!")

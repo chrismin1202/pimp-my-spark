@@ -16,14 +16,14 @@ package com.chrism.spark.aws
 
 import com.chrism.commons.FunTestSuite
 
-final class AwsCredentialsHadoopConfigurationTest extends FunTestSuite {
+final class AwsHadoopConfigurationTest extends FunTestSuite {
 
-  import AwsCredentialsHadoopConfiguration.{addProvider, AnonymousCredentialsProvider, SimpleCredentialsProvider}
+  import AwsHadoopConfiguration.{addCredentialsProvider, AnonymousCredentialsProviderCls, SimpleCredentialsProviderCls}
 
   test("adding a provider: AnonymousAWSCredentialsProvider") {
-    val providers = addProvider(
-      AnonymousCredentialsProvider,
-      s"${SimpleCredentialsProvider.getName},com.other.provider1, com.other.provider2")
+    val providers = addCredentialsProvider(
+      AnonymousCredentialsProviderCls,
+      s"${SimpleCredentialsProviderCls.getName},com.other.provider1, com.other.provider2")
     val expected = "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider," +
       "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider," +
       "com.other.provider1," +
@@ -32,9 +32,9 @@ final class AwsCredentialsHadoopConfigurationTest extends FunTestSuite {
   }
 
   test("adding a provider: SimpleAWSCredentialsProvider") {
-    val providers = addProvider(
-      SimpleCredentialsProvider,
-      s"${AnonymousCredentialsProvider.getName}, com.other.provider1, com.other.provider2")
+    val providers = addCredentialsProvider(
+      SimpleCredentialsProviderCls,
+      s"${AnonymousCredentialsProviderCls.getName}, com.other.provider1, com.other.provider2")
     val expected = "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider," +
       "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider," +
       "com.other.provider1," +

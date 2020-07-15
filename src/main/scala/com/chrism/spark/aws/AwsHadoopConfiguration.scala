@@ -18,22 +18,25 @@ import com.chrism.commons.util.StringUtils
 
 import scala.util.matching.Regex
 
-object AwsCredentialsHadoopConfiguration {
+object AwsHadoopConfiguration {
+
+  val S3aImplName: String = "fs.s3a.impl"
+  val S3aFileSystemCls: Class[_] = classOf[org.apache.hadoop.fs.s3a.S3AFileSystem]
 
   val CredentialsProviderName: String = "fs.s3a.aws.credentials.provider"
   val AccessKeyName: String = "fs.s3a.access.key"
   val SecretKeyName: String = "fs.s3a.secret.key"
 
-  val SimpleCredentialsProvider: Class[_] = classOf[org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider]
-  val AnonymousCredentialsProvider: Class[_] = classOf[org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider]
+  val SimpleCredentialsProviderCls: Class[_] = classOf[org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider]
+  val AnonymousCredentialsProviderCls: Class[_] = classOf[org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider]
   val SupportedCredentialsProviders: Map[String, Int] = Map(
-    SimpleCredentialsProvider.getName -> 1000,
-    AnonymousCredentialsProvider.getName -> 100,
+    SimpleCredentialsProviderCls.getName -> 1000,
+    AnonymousCredentialsProviderCls.getName -> 100,
   )
 
   private val CommaSplit: Regex = ",\\s*".r
 
-  private[aws] def addProvider(provider: Class[_], chainedProviders: String): String =
+  private[aws] def addCredentialsProvider(provider: Class[_], chainedProviders: String): String =
     if (StringUtils.isBlank(chainedProviders)) provider.getName
     else if (chainedProviders.contains(provider.getName)) chainedProviders
     else
