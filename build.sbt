@@ -17,7 +17,7 @@ import Dependencies._
 organization := "com.chrism.spark"
 name := "pimp-my-spark"
 
-version := "3.1.0"
+version := "3.2.0"
 
 scalaVersion := "2.12.10"
 
@@ -43,6 +43,7 @@ javaOptions in Test += "-Djdk.logging.allowStackWalkSearch=true"
 connectInput in Test := true
 
 libraryDependencies ++= Seq(
+  Commons4s,
   SparkCore % Provided,
   SparkSql % Provided,
   SparkHive % Provided,

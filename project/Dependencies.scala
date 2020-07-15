@@ -24,7 +24,7 @@ object Dependencies {
   private val ScalatestVersion: String = "3.0.8"
   private val Specs2CoreVersion: String = "4.7.0"
 
-  val Commons4s: ModuleID = "com.chrism" %% "commons4s" % "1.0.0"
+  val Commons4s: ModuleID = "com.chrism" %% "commons4s" % "1.2.0"
 
   val SparkCore: ModuleID = SparkGroupId %% "spark-core" % SparkVersion
   val SparkSql: ModuleID = SparkGroupId %% "spark-sql" % SparkVersion
