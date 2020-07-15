@@ -14,7 +14,8 @@
  */
 package com.chrism.spark
 
-import org.apache.log4j.{Level, Logger}
+import com.chrism.commons.log.Log4jConfigurer
+import org.apache.log4j
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfterAll, Suite, SuiteMixin}
 
@@ -33,17 +34,16 @@ trait TestSparkSessionLike extends SuiteMixin with BeforeAndAfterAll with SparkS
     * }}}
     * rather than completely overriding unless all of the default log levels need to be overridden.
     *
-    * @return the log name and log4j [[Level]] pairs
+    * @return the log name and log4j [[log4j.Level]] pairs
     */
-  protected def logLevels: Map[String, Level] =
+  protected def logLevels: Map[String, log4j.Level] =
     Map(
-      "org.apache.spark" -> Level.WARN,
-      "org.sparkproject" -> Level.WARN,
-      "io.netty" -> Level.WARN,
+      "org.apache.spark" -> log4j.Level.WARN,
+      "org.sparkproject" -> log4j.Level.WARN,
+      "io.netty" -> log4j.Level.WARN,
     )
 
-  private[this] def setLogLevels(): Unit =
-    logLevels.foreach { case (name, level) => Logger.getLogger(name).setLevel(level) }
+  private[this] def setLogLevels(): Unit = Log4jConfigurer.setLevels(logLevels)
 
   override protected def buildSparkSession(builder: SparkSession.Builder): SparkSession.Builder =
     super.buildSparkSession(builder).master("local[*]")
