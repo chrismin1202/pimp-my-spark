@@ -222,15 +222,6 @@ trait PimpMySparkRow {
         if (_schema.containsFieldName(fieldName)) Option(getStructByName(fieldName))
         else None
 
-      def getStructByNameAs[T](fieldName: String)(convert: Row => T): T = {
-        val struct = row.getAs[Row](fieldName)
-        if (struct == null) null.asInstanceOf[T] else convert(struct)
-      }
-
-      def getStructByNameAsOrNone[T](fieldName: String)(convert: Row => T): Option[T] =
-        if (_schema.containsFieldName(fieldName)) Option(getStructByNameAs(fieldName)(convert))
-        else None
-
       def isNullAtByName(fieldName: String): Boolean = row.isNullAt(row.fieldIndex(fieldName))
     }
 

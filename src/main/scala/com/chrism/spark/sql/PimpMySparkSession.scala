@@ -20,16 +20,32 @@ import org.apache.spark.sql.SparkSession
 
 trait PimpMySparkSession {
 
+  /** The object that contains implicit methods for [[SparkSession]].
+    *
+    * To use the implicit methods defined in this object, simply import the entire object in your scope:
+    * {{{ import spark_session_implicits._ }}}
+    */
   object spark_session_implicits {
 
     implicit final class SparkSessionOps(ss: SparkSession) {
 
       import com.chrism.spark.aws.AwsHadoopConfiguration.{S3aFileSystemCls, S3aImplName}
 
+      /** @return the Hadoop [[Configuration]] instance associated with the given [[SparkSession]] */
       def hadoopConf: Configuration = ss.sparkContext.hadoopConfiguration
 
+      /** Sets the given name-value pair to the Hadoop [[Configuration]] instance.
+        *
+        * @param name the name of the configuration
+        * @param value the value of the configuration
+        * @throws IllegalArgumentException thrown when the name and/or value is null
+        */
       def setHadoopConf(name: String, value: String): Unit = hadoopConf.set(name, value)
 
+      /** Sets the given [[AwsCredentialsLike]] instance to the Hadoop [[Configuration]] instance.
+        *
+        * @param awsCreds the AWS credentials to use for accessing S3
+        */
       def setS3aAccess(awsCreds: AwsCredentialsLike): Unit = {
         val conf = hadoopConf
         conf.set(S3aImplName, S3aFileSystemCls.getName)

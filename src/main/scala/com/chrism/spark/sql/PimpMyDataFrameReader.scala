@@ -32,6 +32,27 @@ trait PimpMyDataFrameReader {
 
     implicit final class DataFrameReaderOps(reader: DataFrameReader) {
 
+      /** Reads from S3 via s3a scheme.
+        *
+        * Before invoking this method, AWS access must be added to Hadoop configuration associated with
+        * the SparkSession.
+        *
+        * The path can be specified in multiple ways:
+        *   - The bucket name can be passed in as {{{ bucketName }}} and
+        *     the relative sub-path within in the bucket can be passed in as its own string.
+        *     ex) {{{ s3a(FileFormat.Text, "bucket-name", "path", "within", "bucket") }}}
+        *   - The full path can be passed in as {{{ bucketName }}} parameter and
+        *     {{{ relativePaths }}} can be omitted entirely.
+        *     ex) {{{ s3a(FileFormat.Text, "bucket-name/path/within/bucket") }}}
+        *   - The bucket name can be passed in as {{{ bucketName }}} and
+        *     the entire relative path can be passed in as a single string.
+        *     ex) {{{ s3a(FileFormat.Text, "bucket-name", "path/within/bucket") }}}
+        *
+        * @param format the [[FileFormat]] of the data in S3
+        * @param bucketName the bucket name
+        * @param relativePaths the relative path within the bucket
+        * @return the [[DataFrame]] created from the data in the given S3 path
+        */
       def s3a(format: FileFormat, bucketName: String, relativePaths: String*): DataFrame =
         reader.format(format.name).load(formatS3aPath(bucketName, relativePaths: _*))
     }
@@ -44,7 +65,7 @@ private[sql] object PimpMyDataFrameReader {
   /** Regex that only handles characters that are deemed safe to use in S3 */
   private[this] val S3PathRegex: Regex = new Regex(
     "(^" + PathSeparator + "+)?([a-zA-Z0-9!\\-_.*'()]+)(" + PathSeparator + "+$)?"
-  ) //"(^/+)?([a-zA-Z0-9!\\-_.*'()]+)(/+$)?".r
+  )
 
   def formatS3aPath(bucketName: String, relativePaths: String*): String =
     "s3a://" + formatPath(bucketName +: relativePaths)

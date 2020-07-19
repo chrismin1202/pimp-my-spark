@@ -14,7 +14,7 @@
  */
 package com.chrism.spark
 
-import com.chrism.spark.sql.PimpMySparkSql
+import com.chrism.spark.sql.{PimpMyDataFrameReader, PimpMySparkRow, PimpMySparkSession, PimpMySparkSql}
 
 /** A trait for supplementing Spark related methods via "pimp-my-library" pattern */
-trait PimpMySpark extends PimpMySparkSql
+trait PimpMySpark extends PimpMySparkSession with PimpMyDataFrameReader with PimpMySparkRow with PimpMySparkSql

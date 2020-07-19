@@ -30,8 +30,6 @@ import scala.reflect.runtime.universe.TypeTag
   */
 final class RowBuilder private (val schema: StructType) {
 
-  // TODO: support STRUCT type
-
   import RowBuilder.{isArrayType, isMapType, matchName, matchType}
 
   private[this] val _values: mutable.Map[String, Any] = mutable.Map.empty
