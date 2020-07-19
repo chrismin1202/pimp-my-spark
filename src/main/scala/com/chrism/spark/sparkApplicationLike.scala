@@ -28,7 +28,7 @@ trait SparkApplicationLike extends MainLike {
   /** Runs the Spark application defined in [[stages()]].
     *
     * @param args the command line arguments
-    * @throws RuntimeException thrown if any of the stages returns failed status
+    * @throws RuntimeException thrown when any of the stages returns failed status
     */
   override final def run(args: Array[String]): Unit = {
     import SparkApplicationLike.FailedStatuses

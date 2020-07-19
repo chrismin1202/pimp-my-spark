@@ -14,7 +14,21 @@
  */
 package com.chrism.spark
 
-import com.chrism.spark.sql.{PimpMyDataFrameReader, PimpMySparkRow, PimpMySparkSession, PimpMySparkSql}
+import com.chrism.commons.datatype.{CaseInsensitiveEnumLikeCompanionLike, EnumLike}
 
-/** A trait for supplementing Spark related methods via "pimp-my-library" pattern */
-trait PimpMySpark extends PimpMySparkSession with PimpMyDataFrameReader with PimpMySparkRow with PimpMySparkSql
+sealed abstract class FileFormat(override final val name: String) extends EnumLike
+
+object FileFormat extends CaseInsensitiveEnumLikeCompanionLike[FileFormat] {
+
+  override lazy val values: IndexedSeq[FileFormat] = IndexedSeq(Csv, Json, Orc, Parquet, Text)
+
+  case object Csv extends FileFormat("csv")
+
+  case object Json extends FileFormat("json")
+
+  case object Orc extends FileFormat("orc")
+
+  case object Parquet extends FileFormat("parquet")
+
+  case object Text extends FileFormat("text")
+}

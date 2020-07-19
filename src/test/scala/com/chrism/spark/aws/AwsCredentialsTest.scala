@@ -12,9 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chrism.spark
+package com.chrism.spark.aws
 
-import com.chrism.spark.sql.{PimpMyDataFrameReader, PimpMySparkRow, PimpMySparkSession, PimpMySparkSql}
+import com.chrism.commons.FunTestSuite
 
-/** A trait for supplementing Spark related methods via "pimp-my-library" pattern */
-trait PimpMySpark extends PimpMySparkSession with PimpMyDataFrameReader with PimpMySparkRow with PimpMySparkSql
+final class AwsCredentialsTest extends FunTestSuite {
+
+  test("obfuscating key in AwsCredentials: 1 character") {
+    assert(AwsCredentials.obfuscate("a") === "*")
+  }
+
+  test("obfuscating key in AwsCredentials: 2 characters") {
+    assert(AwsCredentials.obfuscate("ab") === "**")
+  }
+
+  test("obfuscating key in AwsCredentials: more than 2 characters") {
+    assert(AwsCredentials.obfuscate("abc") === "a**")
+  }
+
+  test("overriding toString to obfuscate secretKey in AwsCredentials") {
+    val creds = AwsCredentials("access-key", "secret-key")
+    assert(creds.toString === "AwsCredentials(access-key,s*********)")
+  }
+}

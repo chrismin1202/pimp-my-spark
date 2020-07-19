@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chrism.spark
+package com.chrism.spark.sql
 
 import com.chrism.commons.FunTestSuite
+import com.chrism.spark.SparkTestSuiteLike
 
-final class PimpMySparkTest extends FunTestSuite with SparkTestSuiteLike with PimpMySpark {
+final class PimpMySparkSqlTest extends FunTestSuite with SparkTestSuiteLike with PimpMySparkSql {
 
-  import PimpMySparkTest._
+  import PimpMySparkSqlTest._
 
   test("INNER JOIN: joinWithUsingThenMap") {
     import spark.implicits._
@@ -171,7 +172,18 @@ final class PimpMySparkTest extends FunTestSuite with SparkTestSuiteLike with Pi
   }
 }
 
-private[this] object PimpMySparkTest {
+private[this] object PimpMySparkSqlTest {
+
+  private val RichardHendricks: Person = Person("Richard Hendricks", Seq("compression", "tab"))
+  private val RichardEmployment: Employment = Employment("Richard Hendricks", "Pied Piper")
+  private val ErlichBachman: Person = Person("Erlich Bachman", Seq("entrepreneur", "cannabis"))
+  private val ErlichEmployment: Employment = Employment("Erlich Bachman", "Pied Piper")
+  private val BertramGilfoyle: Person = Person("Bertram Gilfoyle", Seq("system architecture"))
+  private val GilfoyleEmployment: Employment = Employment("Bertram Gilfoyle", "Pied Piper")
+  private val DineshChugtai: Person = Person("Dinesh Chugtai", Seq("Java", "Scala"))
+  private val DineshEmployment: Employment = Employment("Dinesh Chugtai", "Pied Piper")
+  private val JaredDunn: Person = Person("Jared Dunn", Seq("business development"))
+  private val JaredEmployment: Employment = Employment("Jared Dunn", "Pied Piper")
 
   private final case class Person(name: String, skills: Seq[String])
 
@@ -187,15 +199,4 @@ private[this] object PimpMySparkTest {
         if (e == null) null else e.employer,
         if (p == null) Seq.empty else p.skills)
   }
-
-  private val RichardHendricks: Person = Person("Richard Hendricks", Seq("compression", "tab"))
-  private val RichardEmployment: Employment = Employment("Richard Hendricks", "Pied Piper")
-  private val ErlichBachman: Person = Person("Erlich Bachman", Seq("entrepreneur", "cannabis"))
-  private val ErlichEmployment: Employment = Employment("Erlich Bachman", "Pied Piper")
-  private val BertramGilfoyle: Person = Person("Bertram Gilfoyle", Seq("system architecture"))
-  private val GilfoyleEmployment: Employment = Employment("Bertram Gilfoyle", "Pied Piper")
-  private val DineshChugtai: Person = Person("Dinesh Chugtai", Seq("Java", "Scala"))
-  private val DineshEmployment: Employment = Employment("Dinesh Chugtai", "Pied Piper")
-  private val JaredDunn: Person = Person("Jared Dunn", Seq("business development"))
-  private val JaredEmployment: Employment = Employment("Jared Dunn", "Pied Piper")
 }

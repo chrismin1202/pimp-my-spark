@@ -1,3 +1,5 @@
+import sbt.librarymanagement.InclExclRule
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,16 +21,23 @@ object Dependencies {
   private val SparkGroupId: String = "org.apache.spark"
 
   private val SparkVersion: String = "3.0.0"
+  // Spark 3.0.0 is compiled with Hadoop 2.7.4,
+  // but the corresponding version of hadoop-aws's anonymous S3 access support is a little wonky.
+  private val HadoopVersion: String = "3.2.1"
 
   private val ScalacheckVersion: String = "1.14.0"
   private val ScalatestVersion: String = "3.0.8"
   private val Specs2CoreVersion: String = "4.7.0"
 
-  val Commons4s: ModuleID = "com.chrism" %% "commons4s" % "1.0.0"
+  private val ExcludeHadoop: InclExclRule = ExclusionRule("org.apache.hadoop")
 
-  val SparkCore: ModuleID = SparkGroupId %% "spark-core" % SparkVersion
-  val SparkSql: ModuleID = SparkGroupId %% "spark-sql" % SparkVersion
-  val SparkHive: ModuleID = SparkGroupId %% "spark-hive" % SparkVersion
+  val Commons4s: ModuleID = "com.chrism" %% "commons4s" % "1.2.0"
+
+  val SparkCore: ModuleID = (SparkGroupId %% "spark-core" % SparkVersion).excludeAll(ExcludeHadoop)
+  val SparkSql: ModuleID = (SparkGroupId %% "spark-sql" % SparkVersion).excludeAll(ExcludeHadoop)
+  val SparkHive: ModuleID = (SparkGroupId %% "spark-hive" % SparkVersion).excludeAll(ExcludeHadoop)
+  val HadoopClient: ModuleID = "org.apache.hadoop" % "hadoop-client" % HadoopVersion
+  val HadoopAws: ModuleID = "org.apache.hadoop" % "hadoop-aws" % HadoopVersion
 
   val CatsEffect: ModuleID = "org.typelevel" %% "cats-effect" % "2.1.3"
 

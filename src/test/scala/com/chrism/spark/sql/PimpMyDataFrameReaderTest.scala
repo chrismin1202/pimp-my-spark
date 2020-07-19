@@ -12,9 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chrism.spark
+package com.chrism.spark.sql
 
-import com.chrism.spark.sql.{PimpMyDataFrameReader, PimpMySparkRow, PimpMySparkSession, PimpMySparkSql}
+import com.chrism.commons.FunTestSuite
 
-/** A trait for supplementing Spark related methods via "pimp-my-library" pattern */
-trait PimpMySpark extends PimpMySparkSession with PimpMyDataFrameReader with PimpMySparkRow with PimpMySparkSql
+final class PimpMyDataFrameReaderTest extends FunTestSuite {
+
+  test("formatting S3 path only with bucket name") {
+    val path = PimpMyDataFrameReader.formatS3aPath("bucket")
+    assert(path === "s3a://bucket")
+  }
+
+  test("formatting S3 path with 1 relative path") {
+    val path = PimpMyDataFrameReader.formatS3aPath("bucket", "path-within-bucket")
+    assert(path === "s3a://bucket/path-within-bucket")
+  }
+
+  test("formatting S3 path with multiple relative paths") {
+    val path = PimpMyDataFrameReader.formatS3aPath("bucket", "outer", "inner")
+    assert(path === "s3a://bucket/outer/inner")
+  }
+}
