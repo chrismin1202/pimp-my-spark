@@ -1,19 +1,36 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.chrism.spark.sql
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{LocalDate, LocalDateTime, Month}
 import java.{lang => jl, math => jm, sql => js}
 
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.{ArrayType, DataType, DataTypes, DecimalType, MapType, StructField, StructType}
+import org.apache.spark.sql.{Encoders, Row}
 
 import scala.collection.mutable
+import scala.reflect.runtime.universe.TypeTag
 
 /** A helper class for building a [[Row]] instance with schema.
   *
   * @param schema the schema for the row
   */
 final class RowBuilder private (val schema: StructType) {
+
+  // TODO: support STRUCT type
 
   import RowBuilder.{isArrayType, isMapType, matchName, matchType}
 
@@ -131,7 +148,8 @@ final class RowBuilder private (val schema: StructType) {
   def withJBigDecimalValue(fieldName: String, value: jm.BigDecimal): this.type = {
     val fieldIterator = schema.iterator
     var nameMatch = false
-    while (fieldIterator.hasNext) {
+    var found = false
+    while (!found && fieldIterator.hasNext) {
       val field = fieldIterator.next()
       if (matchName(field, fieldName)) {
         nameMatch = true
@@ -146,6 +164,7 @@ final class RowBuilder private (val schema: StructType) {
               )
           case other => throw new IllegalArgumentException(s"The data type ($other) is not DecimalType!")
         }
+        found = true
       }
     }
     require(nameMatch, s"There is no field named $fieldName in the schema!")
@@ -160,6 +179,12 @@ final class RowBuilder private (val schema: StructType) {
   def withLocalDateValue(fieldName: String, value: LocalDate): this.type =
     withSqlDateValue(fieldName, if (value == null) null else js.Date.valueOf(value))
 
+  def withDateValue(fieldName: String, year: Int, month: Int, dayOfMonth: Int): this.type =
+    withLocalDateValue(fieldName, LocalDate.of(year, month, dayOfMonth))
+
+  def withDateValue(fieldName: String, year: Int, month: Month, dayOfMonth: Int): this.type =
+    withLocalDateValue(fieldName, LocalDate.of(year, month, dayOfMonth))
+
   def withSqlTimestampValue(fieldName: String, value: js.Timestamp): this.type = {
     requireFieldAndType(fieldName, DataTypes.TimestampType)
     withRawValue(fieldName, value)
@@ -167,6 +192,65 @@ final class RowBuilder private (val schema: StructType) {
 
   def withLocalDateTimeValue(fieldName: String, value: LocalDateTime): this.type =
     withSqlTimestampValue(fieldName, if (value == null) null else js.Timestamp.valueOf(value))
+
+  def withDateTimeValue(fieldName: String, year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute))
+
+  def withDateTimeValue(
+    fieldName: String,
+    year: Int,
+    month: Month,
+    dayOfMonth: Int,
+    hour: Int,
+    minute: Int
+  ): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute))
+
+  def withDateTimeValue(
+    fieldName: String,
+    year: Int,
+    month: Int,
+    dayOfMonth: Int,
+    hour: Int,
+    minute: Int,
+    second: Int
+  ): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute, second))
+
+  def withDateTimeValue(
+    fieldName: String,
+    year: Int,
+    month: Month,
+    dayOfMonth: Int,
+    hour: Int,
+    minute: Int,
+    second: Int
+  ): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute, second))
+
+  def withDateTimeValue(
+    fieldName: String,
+    year: Int,
+    month: Int,
+    dayOfMonth: Int,
+    hour: Int,
+    minute: Int,
+    second: Int,
+    nanoOfSecond: Int
+  ): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute, second, nanoOfSecond))
+
+  def withDateTimeValue(
+    fieldName: String,
+    year: Int,
+    month: Month,
+    dayOfMonth: Int,
+    hour: Int,
+    minute: Int,
+    second: Int,
+    nanoOfSecond: Int
+  ): this.type =
+    withLocalDateTimeValue(fieldName, LocalDateTime.of(year, month, dayOfMonth, hour, minute, second, nanoOfSecond))
 
   def withStringValue(fieldName: String, value: String): this.type = {
     requireFieldAndType(fieldName, DataTypes.StringType)
@@ -189,7 +273,34 @@ final class RowBuilder private (val schema: StructType) {
     withRawValue(fieldName, value)
   }
 
-  private def withRawValue(fieldName: String, value: Any): this.type = {
+  def withStructValue[T <: Product: TypeTag](fieldName: String, value: T): this.type =
+    if (value == null) withRawValue(fieldName, null.asInstanceOf[Row])
+    else {
+      val fieldIterator = schema.iterator
+      var nameMatch = false
+      var found = false
+      lazy val valueSchema: StructType = Encoders.product[T].schema
+      while (!found && fieldIterator.hasNext) {
+        val field = fieldIterator.next()
+        if (matchName(field, fieldName)) {
+          nameMatch = true
+          field.dataType match {
+            case st: StructType =>
+              require(
+                st == valueSchema,
+                s"The actual schema of the object ($valueSchema) does not match the expected schema ($st)")
+            case other => throw new IllegalArgumentException(s"The data type ($other) is not StructType!")
+          }
+          found = true
+        }
+      }
+      require(nameMatch, s"There is no field named $fieldName in the schema!")
+      require(found, "The schema of the field is missing!")
+
+      withRawValue(fieldName, new GenericRowWithSchema(value.productIterator.toArray, valueSchema))
+    }
+
+  private[this] def withRawValue(fieldName: String, value: Any): this.type = {
     _values += (fieldName -> value)
     this
   }

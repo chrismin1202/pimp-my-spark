@@ -1,9 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.chrism.spark.sql
 
 import java.time.{LocalDate, LocalDateTime}
 import java.{math => jm, sql => js}
 
 import com.chrism.commons.FunTestSuite
+import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 
 final class RowBuilderTest extends FunTestSuite {
@@ -41,6 +56,19 @@ final class RowBuilderTest extends FunTestSuite {
     intercept[IllegalArgumentException] {
       RowBuilder(schema).withBigDecimalValue("bigdecimal_col", BigDecimal("12.3456"))
     }
+  }
+
+  test("building a row with struct") {
+    import RowBuilderTest.{Dummy, DummySchema}
+
+    val schema = StructType(Seq(StructField("struct_col", DummySchema)))
+    val row = RowBuilder(schema)
+      .withStructValue("struct_col", Dummy("s", 1))
+      .build()
+
+    val struct = row.getStruct(0)
+    assert(struct.getString(0) === "s")
+    assert(struct.getInt(1) === 1)
   }
 
   test("building a row with null values") {
@@ -161,4 +189,11 @@ final class RowBuilderTest extends FunTestSuite {
     row.getSeq[String](19) should contain theSameElementsInOrderAs Seq("a", "b", "c")
     row.getMap[Int, Boolean](20) should contain theSameElementsAs Map(1 -> true, 2 -> false, 3 -> true, 4 -> false)
   }
+}
+
+private[this] object RowBuilderTest {
+
+  private val DummySchema: StructType = ScalaReflection.schemaFor[Dummy].dataType.asInstanceOf[StructType]
+
+  private final case class Dummy(s: String, i: Int)
 }
